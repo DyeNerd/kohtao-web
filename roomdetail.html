@@ -49,6 +49,14 @@
         padding: 10px 20px;
         border-radius: 5px;
         margin-top: 20px;
+        transition: background-color 0.1s ease;
+      }
+      .complete-btn:hover {
+        background-color: #307ac4;
+      }
+      input[type="checkbox"] {
+        transform: scale(1.5); /* Adjust scale value for size */
+        margin: 10px; /* Optional, for better spacing */
       }
     </style>
   </head>
@@ -86,13 +94,15 @@
           <li class="task-status">
             <label class="task-label">
               <input type="checkbox" data-task="1" />
-              <a href="lostandfound.html">1. Check the customer’s belongings</a>
+              <a href="#" id="lostandfound-link"
+                >1. Check the customer’s belongings</a
+              >
             </label>
           </li>
           <li class="task-status">
             <label class="task-label">
               <input type="checkbox" data-task="2" />
-              <a href="managestock.html">2. Fill mini-bar</a>
+              <a href="#" id="managestock-link">2. Fill mini-bar</a>
             </label>
           </li>
           <li class="task-status">
@@ -195,7 +205,8 @@
             );
             localStorage.setItem("roomData", JSON.stringify(updatedRoomData));
 
-            alert("Room tasks updated successfully!");
+            // alert("Room tasks updated successfully!");
+            window.location.href = "housekeeping.html";
           });
       });
     </script>
