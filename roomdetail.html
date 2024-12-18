@@ -213,6 +213,37 @@
             // alert("Room tasks updated successfully!");
             window.location.href = "housekeeping.html";
           });
+        // document
+        //   .querySelector("#housekeepingTable")
+        //   .addEventListener("click", (e) => {
+        //     // Check if the clicked element or its parent has the 'room-link' class
+        //     const roomLink = e.target.closest(".room-link");
+
+        //     if (roomLink) {
+        //       const roomNumber = roomLink.getAttribute("data-room");
+
+        //       if (roomNumber) {
+        //         // Manually set the href with the query parameter
+        //         window.location.href = `roomdetail.html?room=${encodeURIComponent(
+        //           roomNumber
+        //         )}`;
+        //       }
+        //     }
+        //   });
+        document
+          .getElementById("lostandfound-link")
+          .addEventListener("click", (e) => {
+            window.location.href = `lostandfound.html?room=${encodeURIComponent(
+              selectedRoomNumber
+            )}`;
+          });
+        document
+          .getElementById("managestock-link")
+          .addEventListener("click", (e) => {
+            window.location.href = `managestock.html?room=${encodeURIComponent(
+              selectedRoomNumber
+            )}`;
+          });
       });
     </script>
   </body>
