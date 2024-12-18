@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><a href="roomdetail.html" class="room-link" data-room="${
-          room.roomNumber
-        }">${room.roomNumber}</a></td>
+        <td><a href="#" class="room-link" data-room="${room.roomNumber}">${
+        room.roomNumber
+      }</a></td>
         <td>${room.status || "N/A"}</td>
         <td>
           ${
@@ -90,10 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .querySelector("#housekeepingTable")
     .addEventListener("click", (e) => {
-      // Navigate to room detail page
-      if (e.target.classList.contains("room-link")) {
-        const roomNumber = e.target.getAttribute("data-room");
-        localStorage.setItem("selectedRoom", roomNumber);
+      // Check if the clicked element or its parent has the 'room-link' class
+      const roomLink = e.target.closest(".room-link");
+
+      if (roomLink) {
+        const roomNumber = roomLink.getAttribute("data-room");
+
+        if (roomNumber) {
+          // Manually set the href with the query parameter
+          window.location.href = `roomdetail.html?room=${encodeURIComponent(
+            roomNumber
+          )}`;
+        }
       }
 
       // Open assign modal
