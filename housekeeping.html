@@ -26,22 +26,10 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-width: 350px; /* Ensures the container is wider */
-        display: inline-block; /* Wraps tightly around the table */
       }
-
       .table {
-        width: auto; /* Table sizes itself according to content */
-        min-width: 100%; /* Ensures the table spans the container */
-        border-collapse: collapse; /* Standard table styling */
-      }
-      .btn-save {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
       }
       .btn-assign {
         background-color: #28a745;
@@ -52,7 +40,7 @@
         transition: background-color 0.3s ease;
       }
       .btn-assign:hover {
-        background-color: #218838; /* Darker shade of green */
+        background-color: #218838;
         color: white;
       }
     </style>
@@ -66,29 +54,131 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">BOH</a></li>
-          <li class="breadcrumb-item active">HouseKeeping</li>
+          <li class="breadcrumb-item active">Housekeeping</li>
         </ol>
       </nav>
 
-      <!-- Table -->
-      <div class="table-container">
-        <table class="table table-striped" id="housekeepingTable">
-          <thead>
-            <tr>
-              <th>Room Number</th>
-              <th>Status</th>
-              <th>Housekeeper</th>
-              <th>Lost and Found</th>
-              <th>Minibar Stock</th>
-              <th>Task Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <!-- Tabs for Zones -->
+      <ul class="nav nav-tabs" id="zoneTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="service-zone-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#service-zone"
+            type="button"
+            role="tab"
+            aria-controls="service-zone"
+            aria-selected="true"
+          >
+            Service Zone
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="pool-zone-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#pool-zone"
+            type="button"
+            role="tab"
+            aria-controls="pool-zone"
+            aria-selected="false"
+          >
+            Pool Zone
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="room-zone-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#room-zone"
+            type="button"
+            role="tab"
+            aria-controls="room-zone"
+            aria-selected="false"
+          >
+            Room Zone
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="zoneTabsContent">
+        <!-- Service Zone -->
+        <div
+          class="tab-pane fade show active"
+          id="service-zone"
+          role="tabpanel"
+          aria-labelledby="service-zone-tab"
+        >
+          <div class="table-container">
+            <table class="table table-striped" id="serviceZoneTable">
+              <thead>
+                <tr>
+                  <th>Room Number</th>
+                  <th>Status</th>
+                  <th>Housekeeper</th>
+                  <th>Lost and Found</th>
+                  <th>Minibar Stock</th>
+                  <th>Task Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pool Zone -->
+        <div
+          class="tab-pane fade"
+          id="pool-zone"
+          role="tabpanel"
+          aria-labelledby="pool-zone-tab"
+        >
+          <div class="table-container">
+            <table class="table table-striped" id="poolZoneTable">
+              <thead>
+                <tr>
+                  <th>Room Number</th>
+                  <th>Status</th>
+                  <th>Housekeeper</th>
+                  <th>Lost and Found</th>
+                  <th>Minibar Stock</th>
+                  <th>Task Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Room Zone -->
+        <div
+          class="tab-pane fade"
+          id="room-zone"
+          role="tabpanel"
+          aria-labelledby="room-zone-tab"
+        >
+          <div class="table-container">
+            <table class="table table-striped" id="roomZoneTable">
+              <thead>
+                <tr>
+                  <th>Room Number</th>
+                  <th>Status</th>
+                  <th>Housekeeper</th>
+                  <th>Lost and Found</th>
+                  <th>Minibar Stock</th>
+                  <th>Task Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Housekeeper Assignment Modal -->
     <div
       class="modal fade"
       id="assignHousekeeperModal"
@@ -127,6 +217,6 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="housekeeping.js"></script>
+    <script src="tmp.js"></script>
   </body>
 </html>
