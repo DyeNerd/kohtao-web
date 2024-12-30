@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Housekeeping Schedule</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .table-container {
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .date-picker {
+        margin-bottom: 10px;
+      }
+      .nav-tabs {
+        margin-bottom: 15px;
+      }
+      .schedule-table td {
+        text-align: center;
+        vertical-align: middle;
+      }
+      .task-cell {
+        background-color: #e9f7fc;
+        border-radius: 4px;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Housekeeping Schedule</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">BOH</a></li>
+          <li class="breadcrumb-item">
+            <a href="housekeeping.html">HouseKeeping</a>
+          </li>
+          <li class="breadcrumb-item active">HK Schedule</li>
+        </ol>
+      </nav>
+
+      <!-- Date Selector -->
+      <div class="date-picker">
+        <label for="scheduleDate">Date:</label>
+        <input type="date" id="scheduleDate" class="form-control" value="" />
+      </div>
+
+      <!-- Tabs -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            id="service-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#service-schedule"
+            type="button"
+            aria-selected="true"
+          >
+            Service
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            id="pool-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#pool-schedule"
+            type="button"
+            aria-selected="false"
+          >
+            Pool
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            id="room-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#room-schedule"
+            type="button"
+            aria-selected="false"
+          >
+            Room
+          </button>
+        </li>
+      </ul>
+
+      <!-- Schedule Tables -->
+      <div class="tab-content">
+        <div
+          class="tab-pane fade show active table-container"
+          id="service-schedule"
+          style="overflow-x: auto"
+        >
+          <table class="table table-bordered schedule-table">
+            <thead>
+              <tr id="scheduleHeader">
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody id="serviceScheduleBody"></tbody>
+          </table>
+        </div>
+        <div
+          class="tab-pane fade table-container"
+          id="pool-schedule"
+          style="overflow-x: auto"
+        >
+          <table class="table table-bordered schedule-table">
+            <thead>
+              <tr id="scheduleHeaderPool">
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody id="poolScheduleBody"></tbody>
+          </table>
+        </div>
+        <div
+          class="tab-pane fade table-container"
+          id="room-schedule"
+          style="overflow-x: auto"
+        >
+          <table class="table table-bordered schedule-table">
+            <thead>
+              <tr id="scheduleHeaderRoom">
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody id="roomScheduleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="schedule.js"></script>
+  </body>
+</html>
