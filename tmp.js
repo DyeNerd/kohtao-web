@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Populate rows for each housekeeper and task
     filteredTasks.forEach((task) => {
-      const upcomingTask = getUpcomingTask(task.hkName);
+      const upcomingTask = getUpcomingTask(task.hkName, task.workorderId);
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -44,11 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${task.status}</td>
         <td>${task.realStart}</td>
         <td>${task.realEnd}</td>
-        <td>${
-          upcomingTask
-            ? `${upcomingTask.task} (Est. ${upcomingTask.realStart})`
-            : "No upcoming task"
-        }</td>
+        <td>${upcomingTask ? `${upcomingTask.task}` : "No upcoming task"}</td>
       `;
       tableBody.appendChild(row);
     });
@@ -69,9 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Helper function to get the upcoming task for a given housekeeper
-  function getUpcomingTask(hkName) {
+  function getUpcomingTask(hkName, workorderId) {
     const tasks = scheduleData.filter(
-      (task) => task.hkName === hkName && task.status === "to do"
+      (task) =>
+        task.hkName === hkName &&
+        task.status === "to do" &&
+        task.workorderId !== workorderId
     );
     return tasks.length > 0 ? tasks[0] : null;
   }
