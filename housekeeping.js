@@ -1,212 +1,89 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Initialize sample data if localStorage is empty
-  if (
-    !localStorage.getItem("roomData") ||
-    !localStorage.getItem("housekeepers")
-  ) {
-    const sampleRoomData = [
-      {
-        roomNumber: "101",
-        area: "service",
-        status: "Clean",
-        housekeeper: "Alice",
-        lostAndFound: "None",
-        minibarStock: "Full",
-        taskStatus: { cleaning: true, restocking: true, maintenance: false },
-      },
-      {
-        roomNumber: "102",
-        area: "pool",
-        status: "Dirty",
-        housekeeper: null,
-        lostAndFound: "Sunglasses",
-        minibarStock: "Low",
-        taskStatus: { cleaning: false, restocking: true, maintenance: false },
-      },
-      {
-        roomNumber: "103",
-        area: "room",
-        status: "Occupied",
-        housekeeper: "Bob",
-        lostAndFound: "None",
-        minibarStock: "Partial",
-        taskStatus: { cleaning: true, restocking: true, maintenance: true },
-      },
-      {
-        roomNumber: "104",
-        area: "service",
-        status: "Clean",
-        housekeeper: null,
-        lostAndFound: "Wallet",
-        minibarStock: "Full",
-        taskStatus: { cleaning: true, restocking: false, maintenance: false },
-      },
-      {
-        roomNumber: "105",
-        area: "pool",
-        status: "Occupied",
-        housekeeper: "Charlie",
-        lostAndFound: "None",
-        minibarStock: "Low",
-        taskStatus: { cleaning: false, restocking: false, maintenance: true },
-      },
-    ];
+  const scheduleData = JSON.parse(localStorage.getItem("schedule")) || [];
 
-    const sampleHousekeepers = ["Alice", "Bob", "Charlie", "Diana", "Eve"];
-
-    localStorage.setItem("roomData", JSON.stringify(sampleRoomData));
-    localStorage.setItem("housekeepers", JSON.stringify(sampleHousekeepers));
-
-    console.log("Sample data has been added to localStorage.");
-  }
-
-  // Fetch data from localStorage
-  const roomData = JSON.parse(localStorage.getItem("roomData")) || [];
-  const housekeepers = JSON.parse(localStorage.getItem("housekeepers")) || [];
-
-  let currentRoomNumber = null;
-
-  // Populate table for the active tab
+  // Helper function to populate the table based on the selected zone
   function populateTable(zone) {
-    const tableId = {
-      service: "#serviceZoneTable tbody",
-      pool: "#poolZoneTable tbody",
-      room: "#roomZoneTable tbody",
-    }[zone];
+    console.log(`Populating table for zone: ${zone}`); // Debugging log
 
-    if (!tableId) return;
+    // Convert the zone to lowercase to match the table ID
+    const tableBody = document.querySelector(`#${zone}ZoneTable tbody`);
 
-    const tableBody = document.querySelector(tableId);
-    tableBody.innerHTML = ""; // Clear table
+    // Check if the tableBody exists
+    if (!tableBody) {
+      console.error(`Table body for zone ${zone} not found!`);
+      return;
+    }
 
-    const filteredRooms = roomData.filter((room) => room.area === zone);
+    tableBody.innerHTML = ""; // Clear existing rows
 
-    filteredRooms.forEach((room) => {
-      const taskCompleted = room.taskStatus
-        ? Object.values(room.taskStatus).filter((status) => status).length
-        : 0;
+    // Filter tasks by zone (case-sensitive match)
+    const filteredTasks = scheduleData.filter(
+      (task) => task.zone.toLowerCase() === zone // Match zone exactly
+    );
+
+    console.log(`Filtered tasks for ${zone}:`, filteredTasks); // Debugging log
+
+    // If no tasks found, display a message
+    if (filteredTasks.length === 0) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td colspan="6" class="text-center">No tasks found for this zone.</td>`;
+      tableBody.appendChild(row);
+      return;
+    }
+
+    // Populate rows for each housekeeper and task
+    filteredTasks.forEach((task) => {
+      const upcomingTask = getUpcomingTask(task.hkName, task.workorderId);
 
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><a href="#" class="room-link" data-room="${room.roomNumber}">${
-        room.roomNumber
+        <td><a href="#" class="wo-link" data-wo="${task.workorderId}">${
+        task.hkName
       }</a></td>
-        <td>${room.status || "N/A"}</td>
-        <td>
-          ${
-            room.housekeeper
-              ? room.housekeeper
-              : `<button class="btn btn-assign btn-sm" data-room="${room.roomNumber}">Assign</button>`
-          }
-        </td>
-        <td>${room.lostAndFound || "-"}</td>
-        <td>${room.minibarStock || "-"}</td>
-        <td>${taskCompleted} / 9 tasks completed</td>
+        <td>${task.task}</td>
+        <td>${task.status}</td>
+        <td>${task.realStart}</td>
+        <td>${task.realEnd}</td>
+        <td>${upcomingTask ? `${upcomingTask.task}` : "No upcoming task"}</td>
       `;
       tableBody.appendChild(row);
     });
   }
 
-  // Forcefully trigger the tab content for the active tab
-  function initializeDefaultTab() {
-    const defaultZone = getActiveZone();
-    populateTable(defaultZone);
-  }
-
-  function showAssignModal(roomNumber) {
-    currentRoomNumber = roomNumber; // Set the room being assigned
-    const modalBody = document.querySelector(
-      "#assignHousekeeperModal .modal-body"
-    );
-
-    if (housekeepers.length === 0) {
-      modalBody.innerHTML = "<p>No housekeepers available.</p>";
-    } else {
-      modalBody.innerHTML = housekeepers
-        .map(
-          (housekeeper) => `
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="housekeeper" value="${housekeeper}">
-            <label class="form-check-label">${housekeeper}</label>
-          </div>`
-        )
-        .join("");
-    }
-
-    const modal = new bootstrap.Modal(
-      document.getElementById("assignHousekeeperModal")
-    );
-    modal.show();
-  }
-
-  // Complete assignment
-  function completeAssignment() {
-    const selectedHousekeeper = document.querySelector(
-      'input[name="housekeeper"]:checked'
-    );
-    if (!selectedHousekeeper) {
-      alert("Please select a housekeeper!");
-      return;
-    }
-
-    const roomIndex = roomData.findIndex(
-      (room) => room.roomNumber === currentRoomNumber
-    );
-    if (roomIndex !== -1) {
-      roomData[roomIndex].housekeeper = selectedHousekeeper.value; // Assign housekeeper
-      localStorage.setItem("roomData", JSON.stringify(roomData)); // Save to localStorage
-      populateTable(getActiveZone()); // Refresh the table
-
-      const modal = bootstrap.Modal.getInstance(
-        document.getElementById("assignHousekeeperModal")
-      );
-      modal.hide(); // Close modal
-    }
-  }
-
-  // Get active tab zone
-  function getActiveZone() {
-    const activeTab = document.querySelector(".nav-tabs .nav-link.active");
-    return activeTab ? activeTab.id.split("-")[0] : "service";
-  }
-
-  // Event listener for tab switching
-  document.querySelectorAll(".nav-link").forEach((tab) => {
-    tab.addEventListener("shown.bs.tab", (e) => {
-      const zone = e.target.id.split("-")[0];
-      populateTable(zone);
-    });
-  });
-
+  // woLink handler
   document.body.addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-assign")) {
-      const roomNumber = e.target.getAttribute("data-room");
-      showAssignModal(roomNumber);
-    }
-  });
-
-  // Assign modal complete button
-  document
-    .querySelector(".complete-assignment-btn")
-    .addEventListener("click", completeAssignment);
-
-  // Room link click handler
-  document.body.addEventListener("click", (e) => {
-    const roomLink = e.target.closest(".room-link");
-    if (roomLink) {
-      const roomNumber = roomLink.getAttribute("data-room");
-      if (roomNumber) {
+    const woLink = e.target.closest(".wo-link");
+    if (woLink) {
+      const workorderId = woLink.getAttribute("data-wo");
+      if (workorderId) {
         // Navigate to roomdetail.html with the room number as a query parameter
-        window.location.href = `roomdetail.html?room=${encodeURIComponent(
-          roomNumber
+        window.location.href = `roomdetail.html?workorderId=${encodeURIComponent(
+          workorderId
         )}`;
       }
     }
   });
 
-  // Populate the default tab's table on page load
-  populateTable(getActiveZone());
+  // Helper function to get the upcoming task for a given housekeeper
+  function getUpcomingTask(hkName, workorderId) {
+    const tasks = scheduleData.filter(
+      (task) =>
+        task.hkName === hkName &&
+        task.status === "to do" &&
+        task.workorderId !== workorderId
+    );
+    return tasks.length > 0 ? tasks[0] : null;
+  }
 
-  // Initialize the default tab's table on page load
-  initializeDefaultTab();
+  // Event listener for zone tab switching
+  document.querySelectorAll(".nav-link").forEach((tab) => {
+    tab.addEventListener("shown.bs.tab", (e) => {
+      const zone = e.target.id.split("-")[0]; // Get zone from tab ID (Service, Pool, Room)
+      console.log(`Tab switched to zone: ${zone}`); // Debugging log
+      populateTable(zone); // Populate the correct table for the selected zone
+    });
+  });
+
+  // Set default tab and load its data
+  populateTable("service"); // Default to Service zone when page loads
 });
