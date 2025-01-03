@@ -37,7 +37,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${task.hkName || "Unassigned"}</td>
+        <td><a href="#" class="wo-link" data-wo="${task.workorderId}">${
+        task.hkName
+      }</a></td>
         <td>${task.task}</td>
         <td>${task.status}</td>
         <td>${task.realStart}</td>
@@ -51,6 +53,20 @@ document.addEventListener("DOMContentLoaded", () => {
       tableBody.appendChild(row);
     });
   }
+
+  // woLink handler
+  document.body.addEventListener("click", (e) => {
+    const woLink = e.target.closest(".wo-link");
+    if (woLink) {
+      const workorderId = woLink.getAttribute("data-wo");
+      if (workorderId) {
+        // Navigate to roomdetail.html with the room number as a query parameter
+        window.location.href = `roomdetail.html?workorderId=${encodeURIComponent(
+          workorderId
+        )}`;
+      }
+    }
+  });
 
   // Helper function to get the upcoming task for a given housekeeper
   function getUpcomingTask(hkName) {

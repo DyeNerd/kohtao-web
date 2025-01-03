@@ -78,75 +78,33 @@
 
       <!-- Room Details -->
       <div class="details-card">
-        <div class="d-flex justify-content-between">
-          <div>
-            <strong>Room Number:</strong>
-            <span class="text-primary room-number"></span>
+        <div class="row mb-3">
+          <!-- First Row -->
+          <div class="col-md-6 mb-3">
+            <strong>Work Order ID:</strong>
+            <span class="text-primary workorder-id"></span>
           </div>
-          <div>
+          <div class="col-md-6 mb-3 text-end">
+            <strong>Task:</strong>
+            <span class="text-primary task"></span>
+          </div>
+        </div>
+
+        <div class="row mb-3 justify-content-between">
+          <!-- Second Row -->
+          <div class="col-md-6 mb-3">
             <strong>Housekeeper:</strong>
             <span class="text-primary housekeeper"></span>
+          </div>
+          <div class="col-md-6 mb-3 text-end">
+            <strong class="roomParent">Room No.:</strong>
+            <span class="text-primary room"></span>
           </div>
         </div>
         <hr />
         <!-- Tasks List -->
-        <ul class="list-unstyled">
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="1" />
-              <a href="#" id="lostandfound-link"
-                >1. Check the customer’s belongings</a
-              >
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="2" />
-              <a href="#" id="managestock-link">2. Fill mini-bar</a>
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="3" />
-              3. Check TV
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="4" />
-              4. Check air conditioner
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="5" />
-              5. Report to front: Ready for check-out
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="6" />
-              6. Do the bed
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="7" />
-              7. Clean the room
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="8" />
-              8. Clean the bathroom
-            </label>
-          </li>
-          <li class="task-status">
-            <label class="task-label">
-              <input type="checkbox" data-task="9" />
-              9. Report to front: Ready for check-in
-            </label>
-          </li>
+        <ul class="list-unstyled" id="task-list">
+          <!-- Tasks will be populated dynamically -->
         </ul>
         <!-- Complete Button -->
         <div class="text-center">
@@ -159,39 +117,60 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // const selectedRoomNumber = localStorage.getItem("selectedRoom");
+        // Get the workorderId from the URL query parameter
         function getQueryParam(param) {
           const urlParams = new URLSearchParams(window.location.search);
           return urlParams.get(param);
         }
-        const selectedRoomNumber = getQueryParam("room");
-        const roomData = JSON.parse(localStorage.getItem("roomData")) || [];
 
-        if (!selectedRoomNumber) {
-          document.body.innerHTML = "<h1>No room selected!</h1>";
+        const selectedWorkorderId = getQueryParam("workorderId");
+        const scheduleData = JSON.parse(localStorage.getItem("schedule")) || [];
+
+        if (!selectedWorkorderId) {
+          document.body.innerHTML = "<h1>No work order selected!</h1>";
           return;
         }
 
-        let room = roomData.find((r) => r.roomNumber === selectedRoomNumber);
+        // Find the task associated with the selected workorderId
+        let taskData = scheduleData.find(
+          (task) => task.workorderId === selectedWorkorderId
+        );
 
-        if (!room) {
-          document.body.innerHTML = "<h1>Room data not found!</h1>";
+        if (!taskData) {
+          document.body.innerHTML = "<h1>Work order data not found!</h1>";
           return;
         }
 
         // Populate room details
-        document.querySelector(".room-number").textContent = room.roomNumber;
+        document.querySelector(".workorder-id").textContent =
+          taskData.workorderId;
         document.querySelector(".housekeeper").textContent =
-          room.housekeeper || "Not Assigned";
-
-        // Populate task statuses if they exist
-        const tasks = document.querySelectorAll("input[type='checkbox']");
-        if (room.taskStatus) {
-          tasks.forEach((task) => {
-            const taskId = task.getAttribute("data-task");
-            task.checked = room.taskStatus[taskId] || false;
-          });
+          taskData.hkName || "Not Assigned";
+        document.querySelector(".task").textContent = taskData.task;
+        if (taskData.roomNo) {
+          document.querySelector(".roomParent").textContent = "Room No:";
+          document.querySelector(".room").textContent = taskData.roomNo;
+        } else {
+          document.querySelector(".roomParent").textContent = "Zone: ";
+          document.querySelector(".room").textContent = taskData.zone;
         }
+
+        // Populate task list dynamically
+        const taskList = document.querySelector("#task-list");
+        taskData.taskStatus.forEach((task, index) => {
+          const taskItem = document.createElement("li");
+          taskItem.classList.add("task-status");
+
+          taskItem.innerHTML = `
+            <label class="task-label">
+              <input type="checkbox" data-task="${index}" ${
+            task.completed ? "checked" : ""
+          } />
+              <a href="#" class="task-link">${task.subtask}</a>
+            </label>
+          `;
+          taskList.appendChild(taskItem);
+        });
 
         // Save task statuses on Complete button click
         document
@@ -199,50 +178,29 @@
           .addEventListener("click", () => {
             const taskStatus = {};
 
-            tasks.forEach((task) => {
-              const taskId = task.getAttribute("data-task");
-              taskStatus[taskId] = task.checked;
-            });
+            document
+              .querySelectorAll("input[type='checkbox']")
+              .forEach((checkbox) => {
+                const taskId = checkbox.getAttribute("data-task");
+                taskStatus[taskId] = checkbox.checked;
+              });
 
-            room.taskStatus = taskStatus;
-            const updatedRoomData = roomData.map((r) =>
-              r.roomNumber === room.roomNumber ? room : r
+            // Update the taskStatus in the corresponding taskData
+            taskData.taskStatus = taskData.taskStatus.map((task, index) => ({
+              ...task,
+              completed: taskStatus[index] || task.completed,
+            }));
+
+            // Save the updated schedule data back to localStorage
+            const updatedScheduleData = scheduleData.map((task) =>
+              task.workorderId === taskData.workorderId ? taskData : task
             );
-            localStorage.setItem("roomData", JSON.stringify(updatedRoomData));
+            localStorage.setItem(
+              "schedule",
+              JSON.stringify(updatedScheduleData)
+            );
 
-            // alert("Room tasks updated successfully!");
-            window.location.href = "housekeeping.html";
-          });
-        // document
-        //   .querySelector("#housekeepingTable")
-        //   .addEventListener("click", (e) => {
-        //     // Check if the clicked element or its parent has the 'room-link' class
-        //     const roomLink = e.target.closest(".room-link");
-
-        //     if (roomLink) {
-        //       const roomNumber = roomLink.getAttribute("data-room");
-
-        //       if (roomNumber) {
-        //         // Manually set the href with the query parameter
-        //         window.location.href = `roomdetail.html?room=${encodeURIComponent(
-        //           roomNumber
-        //         )}`;
-        //       }
-        //     }
-        //   });
-        document
-          .getElementById("lostandfound-link")
-          .addEventListener("click", (e) => {
-            window.location.href = `lostandfound.html?room=${encodeURIComponent(
-              selectedRoomNumber
-            )}`;
-          });
-        document
-          .getElementById("managestock-link")
-          .addEventListener("click", (e) => {
-            window.location.href = `managestock.html?room=${encodeURIComponent(
-              selectedRoomNumber
-            )}`;
+            window.location.href = "housekeeping.html"; // Redirect back to housekeeping page
           });
       });
     </script>
