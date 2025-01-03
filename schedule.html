@@ -14,17 +14,15 @@
         background-color: #f8f9fa;
       }
       .table-container {
-        margin-top: 20px;
+        margin-top: 0px;
         background: #fff;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
-      .date-picker {
-        margin-bottom: 10px;
-      }
       .nav-tabs {
-        margin-bottom: 15px;
+        margin-top: 20px;
+        margin-bottom: 0px;
       }
       .schedule-table td {
         text-align: center;
@@ -34,6 +32,35 @@
         background-color: #e9f7fc;
         border-radius: 4px;
         padding: 5px;
+      }
+      .d-flex.align-items-center {
+        margin-top: 20px;
+        display: flex;
+        align-items: center; /* Align all elements in the middle */
+        gap: 0.5rem; /* Add spacing between elements */
+      }
+
+      .date-picker {
+        display: flex;
+        align-items: center; /* Ensure the label aligns with the input */
+      }
+
+      .date-picker label {
+        margin-bottom: 0; /* Remove extra spacing below the label */
+        display: inline-block; /* Ensure consistent alignment */
+        line-height: 1.5; /* Match the input field's line height */
+      }
+
+      .date-picker input {
+        height: calc(1.5em + 0.75rem + 2px); /* Match the height of the input */
+        line-height: 1.5; /* Ensure the height is correct */
+        box-sizing: border-box; /* Include padding and border in height */
+      }
+
+      #upload-schedule-btn {
+        height: calc(1.5em + 0.75rem + 2px); /* Match the height of the input */
+        line-height: 1.5; /* Align the button's text */
+        vertical-align: middle; /* Align button with the input */
       }
     </style>
   </head>
@@ -51,9 +78,20 @@
       </nav>
 
       <!-- Date Selector -->
-      <div class="date-picker">
-        <label for="scheduleDate">Date:</label>
-        <input type="date" id="scheduleDate" class="form-control" value="" />
+      <div class="d-flex align-items-center">
+        <div class="date-picker me-3">
+          <label for="scheduleDate" class="me-2">Date:</label>
+          <input type="date" id="scheduleDate" class="form-control" />
+        </div>
+        <button id="upload-schedule-btn" class="btn btn-primary">
+          Upload Schedule
+        </button>
+        <input
+          type="file"
+          id="schedule-file-input"
+          accept=".csv"
+          style="display: none"
+        />
       </div>
 
       <!-- Tabs -->

@@ -1,49 +1,148 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Set default date to today
+  // Set default date to today in dd/mm/yyyy format
   const dateInput = document.getElementById("scheduleDate");
-  const today = new Date().toISOString().split("T")[0];
-  dateInput.value = today;
+  const today = formatDate(new Date());
+  dateInput.value = formatDateForInput(new Date());
 
-  // Sample schedule data
+  // Sample schedule data with dd/mm/yyyy format
   if (!localStorage.getItem("schedule")) {
     const sampleSchedule = [
       {
-        housekeeper: "Somjai L. (Jai)",
-        task: "Beach cleaning",
-        start: 6,
-        end: 8,
-        date: today,
-        area: "service",
+        hkId: "660001",
+        hkName: "Somsri K. (Som)",
+        date: "01/01/2025",
+        startTime: 6,
+        endTime: 10,
+        zone: "Room",
+        task: "Make Up",
+        roomNo: "001",
       },
       {
-        housekeeper: "Somjai L. (Jai)",
-        task: "Make up - 001",
-        start: 8,
-        end: 9.5,
-        date: today,
-        area: "service",
+        hkId: "660002",
+        hkName: "Somjai L. (Jai)",
+        date: "01/01/2025",
+        startTime: 6,
+        endTime: 10,
+        zone: "Room",
+        task: "Make Up",
+        roomNo: "002",
       },
       {
-        housekeeper: "Saiyai L. (Sai)",
-        task: "Check out - 004",
-        start: 10,
-        end: 12,
-        date: today,
-        area: "room",
+        hkId: "660003",
+        hkName: "Saiyai L. (Sai)",
+        date: "01/01/2025",
+        startTime: 10,
+        endTime: 12,
+        zone: "Room",
+        task: "Check Out",
+        roomNo: "003",
       },
       {
-        housekeeper: "Somjai L. (Jai)",
-        task: "Pool cleaning",
-        start: 6,
-        end: 8,
-        date: today,
-        area: "pool",
+        hkId: "660007",
+        hkName: "Chaijai L. (Chai)",
+        date: "01/01/2025",
+        startTime: 8,
+        endTime: 17,
+        zone: "Pool",
+        task: "Pool 1",
+        roomNo: "",
       },
     ];
     localStorage.setItem("schedule", JSON.stringify(sampleSchedule));
   }
 
-  const scheduleData = JSON.parse(localStorage.getItem("schedule"));
+  let scheduleData = JSON.parse(localStorage.getItem("schedule"));
+
+  // CSV Parsing and Uploading
+  document
+    .getElementById("upload-schedule-btn")
+    .addEventListener("click", () => {
+      document.getElementById("schedule-file-input").click();
+    });
+
+  document
+    .getElementById("schedule-file-input")
+    .addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const csvData = e.target.result;
+          try {
+            const newSchedule = parseCSV(csvData);
+
+            // Retrieve existing schedule
+            let existingSchedule = localStorage.getItem("schedule");
+            existingSchedule = existingSchedule
+              ? JSON.parse(existingSchedule)
+              : [];
+
+            // Merge new schedule with existing schedule
+            const updatedSchedule = [...existingSchedule, ...newSchedule];
+
+            // Save updated schedule to local storage
+            localStorage.setItem("schedule", JSON.stringify(updatedSchedule));
+            alert("Schedule uploaded and appended successfully!");
+
+            // Update the schedule display
+            scheduleData = updatedSchedule;
+            updateSchedule();
+          } catch (error) {
+            alert(
+              "Error parsing the file. Please ensure it matches the required format."
+            );
+            console.error(error);
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+
+  function parseCSV(data) {
+    const rows = data.trim().split("\n");
+    const headers = rows[0].split(",");
+    const schedule = [];
+
+    for (let i = 1; i < rows.length; i++) {
+      const values = rows[i].split(",");
+      const entry = {};
+      headers.forEach((header, index) => {
+        entry[header.trim()] = values[index] ? values[index].trim() : "";
+      });
+
+      // Map CSV fields to schedule fields
+      schedule.push({
+        hkId: entry["HK ID"],
+        hkName: entry["HK Name"],
+        date: entry["Date"], // Use dd/mm/yyyy format directly from CSV
+        startTime: convertTimeToDecimal(entry["Start Time"]),
+        endTime: convertTimeToDecimal(entry["End Time"]),
+        zone: entry["Zone"],
+        task: entry["Task"],
+        roomNo: entry["Room No"],
+      });
+    }
+    return schedule;
+  }
+
+  function convertTimeToDecimal(time) {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours + minutes / 60;
+  }
+
+  function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // Format for HTML input type="date"
+  }
 
   // Create the header dynamically
   function createHeader(headerId) {
@@ -52,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const hour = Math.floor(i);
       const minutes = i % 1 === 0 ? "00" : "30";
       const column = document.createElement("th");
-      column.style.minWidth = "80px"; // Fixed width for columns
+      column.style.minWidth = "40px"; // Fixed width for columns
       column.textContent = `${hour}:${minutes}`;
       headerRow.appendChild(column);
     }
@@ -65,22 +164,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Filter data for the selected area and date
     const filteredData = scheduleData.filter(
-      (entry) => entry.area === area && entry.date === dateInput.value
+      (entry) =>
+        entry.zone.toLowerCase() === area &&
+        entry.date === formatDate(new Date(dateInput.value)) // Compare with dd/mm/yyyy format
     );
 
     // Group tasks by housekeeper
     const groupedData = {};
     filteredData.forEach((entry) => {
-      if (!groupedData[entry.housekeeper]) {
-        groupedData[entry.housekeeper] = [];
+      if (!groupedData[entry.hkName]) {
+        groupedData[entry.hkName] = [];
       }
-      groupedData[entry.housekeeper].push(entry);
+      groupedData[entry.hkName].push(entry);
     });
 
     // Create table rows
-    Object.entries(groupedData).forEach(([housekeeper, tasks]) => {
+    Object.entries(groupedData).forEach(([hkName, tasks]) => {
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${housekeeper}</td>`;
+      // row.innerHTML = `<td>${hkName}</td>`;
+      row.innerHTML = `<td style="min-width: 150px;">${hkName}</td>`;
 
       for (let i = 6; i <= 20; i += 0.5) {
         const hour = Math.floor(i);
@@ -89,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cell = document.createElement("td");
         cell.style.minWidth = "80px"; // Fixed width for columns
-        const task = tasks.find((t) => t.start <= time && t.end > time);
+        const task = tasks.find((t) => t.startTime <= time && t.endTime > time);
         if (task) {
           if (
             row.lastElementChild &&
