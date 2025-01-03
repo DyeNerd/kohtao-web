@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       workorderId: generateWorkorderId(entry.date, index + 1),
       status: "to do", // Default status
       taskStatus: generateTaskStatus(entry.task),
+      realStart: `Est. ${entry.startTime}:00`, // Initialize realStart
+      realEnd: `Est. ${entry.endTime}:00`, // Initialize realEnd
     }));
 
     localStorage.setItem("schedule", JSON.stringify(enrichedSchedule));
@@ -132,6 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
         workorderId: generateWorkorderId(entry["Date"], schedule.length + 1),
         status: "to do",
         taskStatus: generateTaskStatus(entry["Task"]),
+        realStart: `Est. ${entry["Start Time"]}`,
+        realEnd: `Est. ${entry["End Time"]}`,
       });
     }
     return schedule;
