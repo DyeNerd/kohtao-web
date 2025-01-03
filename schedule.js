@@ -48,7 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
         roomNo: "",
       },
     ];
-    localStorage.setItem("schedule", JSON.stringify(sampleSchedule));
+
+    // Enrich the sample schedule with new fields
+    const enrichedSchedule = sampleSchedule.map((entry, index) => ({
+      ...entry,
+      workorderId: generateWorkorderId(entry.date, index + 1),
+      status: "to do", // Default status
+      taskStatus: generateTaskStatus(entry.task),
+    }));
+
+    localStorage.setItem("schedule", JSON.stringify(enrichedSchedule));
   }
 
   let scheduleData = JSON.parse(localStorage.getItem("schedule"));
@@ -120,6 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
         zone: entry["Zone"],
         task: entry["Task"],
         roomNo: entry["Room No"],
+        workorderId: generateWorkorderId(entry["Date"], schedule.length + 1),
+        status: "to do",
+        taskStatus: generateTaskStatus(entry["Task"]),
       });
     }
     return schedule;
@@ -181,7 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create table rows
     Object.entries(groupedData).forEach(([hkName, tasks]) => {
       const row = document.createElement("tr");
-      // row.innerHTML = `<td>${hkName}</td>`;
       row.innerHTML = `<td style="min-width: 150px;">${hkName}</td>`;
 
       for (let i = 6; i <= 20; i += 0.5) {
@@ -197,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
             row.lastElementChild &&
             row.lastElementChild.getAttribute("data-task") === task.task
           ) {
-            // Merge cells for the same task
             row.lastElementChild.colSpan =
               parseInt(row.lastElementChild.colSpan || "1") + 1;
             continue; // Skip adding a new cell
@@ -212,6 +222,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       tableBody.appendChild(row);
     });
+  }
+
+  // New Functions for Enhanced Schedule Format
+
+  // Generate workorderId
+  function generateWorkorderId(date, index) {
+    const formattedDate = date.replaceAll("-", "");
+    const runningNumber = String(index).padStart(3, "0");
+    return `${formattedDate}-${runningNumber}`;
+  }
+
+  // Generate taskStatus
+  function generateTaskStatus(task) {
+    const subtasks =
+      task === "Make Up"
+        ? ["Bed", "Bathroom", "Vacuum"]
+        : task === "Check Out"
+        ? ["Inspection", "Cleaning", "Restock"]
+        : ["General Task"];
+    return subtasks.map((subtask) => ({ subtask, completed: false }));
   }
 
   // Update schedule when date or tab changes
