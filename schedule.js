@@ -5,62 +5,62 @@ document.addEventListener("DOMContentLoaded", () => {
   dateInput.value = formatDateForInput(new Date());
 
   // Sample schedule data with dd/mm/yyyy format
-  if (!localStorage.getItem("schedule")) {
-    const sampleSchedule = [
-      {
-        hkId: "660001",
-        hkName: "Somsri K. (Som)",
-        date: "01/01/2025",
-        startTime: 6,
-        endTime: 10,
-        zone: "Room",
-        task: "Make Up",
-        roomNo: "001",
-      },
-      {
-        hkId: "660002",
-        hkName: "Somjai L. (Jai)",
-        date: "01/01/2025",
-        startTime: 6,
-        endTime: 10,
-        zone: "Room",
-        task: "Make Up",
-        roomNo: "002",
-      },
-      {
-        hkId: "660003",
-        hkName: "Saiyai L. (Sai)",
-        date: "01/01/2025",
-        startTime: 10,
-        endTime: 12,
-        zone: "Room",
-        task: "Check Out",
-        roomNo: "003",
-      },
-      {
-        hkId: "660007",
-        hkName: "Chaijai L. (Chai)",
-        date: "01/01/2025",
-        startTime: 8,
-        endTime: 17,
-        zone: "Pool",
-        task: "Pool 1",
-        roomNo: "",
-      },
-    ];
+  // if (!localStorage.getItem("schedule")) {
+  //   const sampleSchedule = [
+  //     {
+  //       hkId: "660001",
+  //       hkName: "Somsri K. (Som)",
+  //       date: "01/01/2025",
+  //       startTime: 6,
+  //       endTime: 10,
+  //       zone: "Room",
+  //       task: "Make Up",
+  //       roomNo: "001",
+  //     },
+  //     {
+  //       hkId: "660002",
+  //       hkName: "Somjai L. (Jai)",
+  //       date: "01/01/2025",
+  //       startTime: 6,
+  //       endTime: 10,
+  //       zone: "Room",
+  //       task: "Make Up",
+  //       roomNo: "002",
+  //     },
+  //     {
+  //       hkId: "660003",
+  //       hkName: "Saiyai L. (Sai)",
+  //       date: "01/01/2025",
+  //       startTime: 10,
+  //       endTime: 12,
+  //       zone: "Room",
+  //       task: "Check Out",
+  //       roomNo: "003",
+  //     },
+  //     {
+  //       hkId: "660007",
+  //       hkName: "Chaijai L. (Chai)",
+  //       date: "01/01/2025",
+  //       startTime: 8,
+  //       endTime: 17,
+  //       zone: "Pool",
+  //       task: "Pool 1",
+  //       roomNo: "",
+  //     },
+  //   ];
 
-    // Enrich the sample schedule with new fields
-    const enrichedSchedule = sampleSchedule.map((entry, index) => ({
-      ...entry,
-      workorderId: generateWorkorderId(entry.date, index + 1),
-      status: "to do", // Default status
-      taskStatus: generateTaskStatus(entry.task),
-      realStart: `Est. ${entry.startTime}:00`, // Initialize realStart
-      realEnd: `Est. ${entry.endTime}:00`, // Initialize realEnd
-    }));
+  //   // Enrich the sample schedule with new fields
+  //   const enrichedSchedule = sampleSchedule.map((entry, index) => ({
+  //     ...entry,
+  //     workorderId: generateWorkorderId(entry.date, index + 1),
+  //     status: "to do", // Default status
+  //     taskStatus: generateTaskStatus(entry.task),
+  //     realStart: `Est. ${entry.startTime}:00`, // Initialize realStart
+  //     realEnd: `Est. ${entry.endTime}:00`, // Initialize realEnd
+  //   }));
 
-    localStorage.setItem("schedule", JSON.stringify(enrichedSchedule));
-  }
+  //   localStorage.setItem("schedule", JSON.stringify(enrichedSchedule));
+  // }
 
   let scheduleData = JSON.parse(localStorage.getItem("schedule"));
 
@@ -241,9 +241,39 @@ document.addEventListener("DOMContentLoaded", () => {
   function generateTaskStatus(task) {
     const subtasks =
       task === "Make Up"
-        ? ["Bed", "Bathroom", "Vacuum"]
+        ? [
+            "06:00 - เริ่มงาน ทำความสะอาดหน้าหาด",
+            "08:00 - เบิกผ้า กรณีลูกค้าพักคืนที่ 2 ขึ้นไป",
+            `08:30 -  เริ่มทำความสะอาดห้อง
+                      เปลี่ยนผ้าปูที่นอน ปลอกหมอน ผ้าห่ม ผ้าเช็คตัว
+                      นับจำนวนมินิบาร์ที่ต้องเติม`,
+            "12:30 - พักกลางวัน",
+            "13:15 - เบิกมินิบาร์",
+            `14:00 -  เริ่มทำความสะอาดห้องต่อ
+                      เติมมินิบาร์
+                      ทำความสะอาดห้อง
+                      แยกขยะก่อนนำลงมาทิ้ง`,
+            "16:00 - จบงาน",
+          ]
         : task === "Check Out"
-        ? ["Inspection", "Cleaning", "Restock"]
+        ? [
+            "ตรวจสอบทรัพย์สินลูกค้า",
+            "ตรวจสอบทรัพย์สินรีสอร์ท",
+            "เริ่มทำความสะอาด",
+            "1. ห้องน้ำ",
+            "2. อ่างล้างหน้า",
+            "3. ทำความสะอาดโต๊ะ",
+            "4. ตู้เสื้อผ้า",
+            "5. เตียงนอน",
+            "6. ทำความสะอาดภายในห้องพัก",
+            "7. ทำความสะอาดภายนอกห้องพัก",
+            "8. ตรวจสอบไฟ",
+            "9. ปิดประตู",
+            "ความสะอาดโดยรอบ",
+            "เก็บอุปกรณ์",
+            "แยกขยะก่อนที่จะนำลงมาทิ้ง",
+            "จบงาน",
+          ]
         : ["General Task"];
     return subtasks.map((subtask) => ({ subtask, completed: false }));
   }
