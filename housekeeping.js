@@ -1,6 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const scheduleData = JSON.parse(localStorage.getItem("schedule")) || [];
 
+  // Helper function to get query parameters
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
   // Helper function to populate the table based on the selected zone
   function populateTable(zone) {
     console.log(`Populating table for zone: ${zone}`); // Debugging log
@@ -34,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Populate rows for each housekeeper and task
     filteredTasks.forEach((task) => {
       const upcomingTask = getUpcomingTask(task.hkName, task.workorderId);
-
       const row = document.createElement("tr");
       row.innerHTML = `
         <td><a href="#" class="wo-link" data-wo="${task.workorderId}">${
@@ -84,6 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Set default tab and load its data
-  populateTable("service"); // Default to Service zone when page loads
+  // NEW: Get the zone from the query parameter and activate the corresponding tab
+  const defaultZone = getQueryParam("zone") || "service"; // Default to "service" if no zone is specified
+  const tabLink = document.querySelector(`#${defaultZone}-zone-tab`); // Tab link ID pattern: e.g., "service-tab"
+
+  if (tabLink) {
+    const bootstrapTab = new bootstrap.Tab(tabLink);
+    bootstrapTab.show(); // Activate the tab programmatically
+  }
+
+  // Populate the table for the default or selected zone
+  populateTable(defaultZone);
 });

@@ -162,46 +162,83 @@
           taskItem.classList.add("task-status");
 
           taskItem.innerHTML = `
-            <label class="task-label">
-              <input type="checkbox" data-task="${index}" ${
+        <label class="task-label">
+          <input type="checkbox" data-task="${index}" ${
             task.completed ? "checked" : ""
           } />
-              <a href="#" class="task-link">${task.subtask}</a>
-            </label>
-          `;
+          <a href="#" class="task-link">${task.subtask}</a>
+        </label>
+      `;
           taskList.appendChild(taskItem);
         });
+
+        // Determine task status
+        function determineStatus() {
+          const completedCount = taskData.taskStatus.filter(
+            (task) => task.completed
+          ).length;
+          if (completedCount === 0) return "to do";
+          if (completedCount < taskData.taskStatus.length) return "doing";
+          return "done";
+        }
+
+        // Update task status, realStart, and realEnd
+        function updateStatus() {
+          const previousStatus = taskData.status;
+          const currentStatus = determineStatus();
+
+          // Update realStart if transitioning from "to do" to another state
+          if (previousStatus === "to do" && currentStatus !== "to do") {
+            taskData.realStart = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          }
+
+          // Update realEnd if transitioning to "done" from any state
+          if (previousStatus !== "done" && currentStatus === "done") {
+            taskData.realEnd = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+          }
+
+          taskData.status = currentStatus;
+          saveToLocalStorage();
+        }
+
+        // Save updated task data to localStorage
+        function saveToLocalStorage() {
+          const updatedScheduleData = scheduleData.map((task) =>
+            task.workorderId === taskData.workorderId ? taskData : task
+          );
+          localStorage.setItem("schedule", JSON.stringify(updatedScheduleData));
+        }
+
+        // Listen to checkbox changes
+        document
+          .querySelectorAll("input[type='checkbox']")
+          .forEach((checkbox) => {
+            checkbox.addEventListener("change", (event) => {
+              const taskId = event.target.getAttribute("data-task");
+              taskData.taskStatus[taskId].completed = event.target.checked;
+              updateStatus(); // Update status immediately when checkbox is toggled
+            });
+          });
 
         // Save task statuses on Complete button click
         document
           .querySelector(".complete-btn")
           .addEventListener("click", () => {
-            const taskStatus = {};
-
-            document
-              .querySelectorAll("input[type='checkbox']")
-              .forEach((checkbox) => {
-                const taskId = checkbox.getAttribute("data-task");
-                taskStatus[taskId] = checkbox.checked;
-              });
-
-            // Update the taskStatus in the corresponding taskData
-            taskData.taskStatus = taskData.taskStatus.map((task, index) => ({
-              ...task,
-              completed: taskStatus[index] || task.completed,
-            }));
-
-            // Save the updated schedule data back to localStorage
-            const updatedScheduleData = scheduleData.map((task) =>
-              task.workorderId === taskData.workorderId ? taskData : task
-            );
-            localStorage.setItem(
-              "schedule",
-              JSON.stringify(updatedScheduleData)
-            );
-
-            window.location.href = "housekeeping.html"; // Redirect back to housekeeping page
+            const zone = taskData.zone.toLowerCase(); // Get the zone
+            updateStatus(); // Ensure the status is updated
+            window.location.href = `housekeeping.html?zone=${encodeURIComponent(
+              zone
+            )}`; // Redirect with zone parameter
           });
+
+        // Initial status update
+        updateStatus();
       });
     </script>
   </body>
