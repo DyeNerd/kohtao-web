@@ -54,6 +54,21 @@
       .complete-btn:hover {
         background-color: #307ac4;
       }
+      .lost-and-found-btn {
+        background-color: #f39c12;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      .lost-and-found-btn:hover {
+        background-color: #d87b0d;
+      }
       input[type="checkbox"] {
         transform: scale(1.5); /* Adjust scale value for size */
         margin: 10px; /* Optional, for better spacing */
@@ -156,21 +171,48 @@
         }
 
         // Populate task list dynamically
-        const taskList = document.querySelector("#task-list");
-        taskData.taskStatus.forEach((task, index) => {
-          const taskItem = document.createElement("li");
-          taskItem.classList.add("task-status");
+        function populateTaskList() {
+          const taskList = document.querySelector("#task-list");
+          taskData.taskStatus.forEach((task, index) => {
+            const taskItem = document.createElement("li");
+            taskItem.classList.add("task-status");
 
-          taskItem.innerHTML = `
-        <label class="task-label">
-          <input type="checkbox" data-task="${index}" ${
-            task.completed ? "checked" : ""
-          } />
-          <a href="#" class="task-link">${task.subtask}</a>
-        </label>
-      `;
-          taskList.appendChild(taskItem);
-        });
+            const isLostAndFoundButtonRequired =
+              taskData.task === "Check Out" &&
+              task.subtask === "ตรวจสอบทรัพย์สินลูกค้า";
+
+            const isManageStockButtonRequired =
+              taskData.task === "Check Out" &&
+              task.subtask === "ตรวจสอบทรัพย์สินรีสอร์ท";
+
+            taskItem.innerHTML = `
+              <label class="task-label">
+                <input type="checkbox" data-task="${index}" ${
+              task.completed ? "checked" : ""
+            } />
+                <a href="#" class="task-link">${task.subtask}</a>
+              </label>
+              ${
+                isLostAndFoundButtonRequired
+                  ? `<button class="lost-and-found-btn" onclick="location.href='lostandfound.html';">Lost and Found</button>`
+                  : ""
+              }
+              ${
+                isManageStockButtonRequired
+                  ? `<button class="lost-and-found-btn" onclick="location.href='managestock.html';">Manage Stock</button>`
+                  : ""
+              }
+            `;
+            taskList.appendChild(taskItem);
+          });
+        }
+
+        function redirectToPage(pageUrl) {
+          console.log(pageUrl);
+          window.location.href = pageUrl;
+        }
+
+        populateTaskList();
 
         // Determine task status
         function determineStatus() {

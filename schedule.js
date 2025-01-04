@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const values = rows[i].split(",");
       const entry = {};
       headers.forEach((header, index) => {
-        entry[header.trim()] = values[index] ? values[index].trim() : "";
+        entry[header.trim()] = values[index] ? values[index].trim() : null;
       });
 
       // Map CSV fields to schedule fields
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         endTime: convertTimeToDecimal(entry["End Time"]),
         zone: entry["Zone"],
         task: entry["Task"],
-        roomNo: entry["Room No"],
+        roomNo: entry["Room No."] || null,
         workorderId: generateWorkorderId(entry["Date"], schedule.length + 1),
         status: "to do",
         taskStatus: generateTaskStatus(entry["Task"]),
