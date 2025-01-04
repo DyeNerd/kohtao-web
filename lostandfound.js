@@ -1,36 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Parse the workorderId from the URL
   const urlParams = new URLSearchParams(window.location.search);
-  const roomNumber = urlParams.get("room");
+  const workorderId = urlParams.get("workorderId");
 
-  // Fetch housekeeper data from localStorage
-  const roomData = JSON.parse(localStorage.getItem("roomData")) || [];
-  const housekeeper =
-    roomData.find((room) => room.roomNumber === roomNumber)?.housekeeper ||
-    "N/A";
+  // Fetch task data from localStorage
+  const scheduleData = JSON.parse(localStorage.getItem("schedule")) || [];
+  const taskData = scheduleData.find(
+    (task) => task.workorderId === workorderId
+  );
 
-  // Set room details
-  document.getElementById("roomNumber").textContent = roomNumber || "N/A";
+  if (!taskData) {
+    alert("Work order data not found!");
+    return;
+  }
+
+  const housekeeper = taskData.hkName || "N/A";
+
+  // Populate room details
+  document.getElementById("roomNumber").textContent = taskData.roomNo || "N/A";
   document.getElementById("housekeeper").textContent = housekeeper;
 
-  // Set the Room Detail breadcrumb link
+  // Set Room Detail breadcrumb link
   const roomDetailBreadcrumb = document.getElementById("roomDetailBreadcrumb");
-  roomDetailBreadcrumb.href = `roomdetail.html?room=${encodeURIComponent(
-    roomNumber
+  roomDetailBreadcrumb.href = `roomdetail.html?workorderId=${encodeURIComponent(
+    workorderId
   )}`;
-  //   roomDetailBreadcrumb.textContent = `Room Detail - ${roomNumber}`;
-
-  // File upload handling
-  const uploadContainer = document.getElementById("uploadContainer");
-  const uploadInput = document.getElementById("uploadPicture");
-
-  uploadContainer.addEventListener("click", () => {
-    uploadInput.click();
-  });
-
-  uploadInput.addEventListener("change", () => {
-    const fileName = uploadInput.files[0]?.name || "No file chosen";
-    uploadContainer.innerHTML = `<p>${fileName}</p>`;
-  });
 
   // Form submission handler
   document
@@ -41,24 +35,31 @@ document.addEventListener("DOMContentLoaded", () => {
       const lostItem = document.getElementById("lostItem").value;
       const uploadedFile = document.getElementById("uploadPicture").files[0];
 
+      // Validate input fields
+      if (!lostItem) {
+        alert("Please describe the lost item.");
+        return;
+      }
+
       if (!uploadedFile) {
         alert("Please upload a picture.");
         return;
       }
 
-      // Save the lost item data
+      // Save the lost and found data
       const lostAndFoundData =
-        JSON.parse(localStorage.getItem("lostAndFound")) || [];
+        JSON.parse(localStorage.getItem("lostandfound")) || [];
       lostAndFoundData.push({
-        roomNumber,
-        housekeeper,
-        lostItem,
-        uploadedFileName: uploadedFile.name,
-        timestamp: new Date().toISOString(),
+        lostitem: lostItem,
+        picture: uploadedFile.name,
+        workorderId: workorderId,
+        time: new Date().toISOString(),
       });
-      localStorage.setItem("lostAndFound", JSON.stringify(lostAndFoundData));
+      localStorage.setItem("lostandfound", JSON.stringify(lostAndFoundData));
 
       alert("Lost and Found data submitted successfully!");
+
+      // Reset the form
       document.getElementById("lostAndFoundForm").reset();
     });
 });

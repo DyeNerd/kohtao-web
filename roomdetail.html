@@ -131,6 +131,12 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      function redirectToPage(pageUrl, workorderId) {
+        const encodedUrl = `${pageUrl}?workorderId=${encodeURIComponent(
+          workorderId
+        )}`;
+        window.location.href = encodedUrl;
+      }
       document.addEventListener("DOMContentLoaded", () => {
         // Get the workorderId from the URL query parameter
         function getQueryParam(param) {
@@ -186,30 +192,25 @@
               task.subtask === "ตรวจสอบทรัพย์สินรีสอร์ท";
 
             taskItem.innerHTML = `
-              <label class="task-label">
-                <input type="checkbox" data-task="${index}" ${
+      <label class="task-label">
+        <input type="checkbox" data-task="${index}" ${
               task.completed ? "checked" : ""
             } />
-                <a href="#" class="task-link">${task.subtask}</a>
-              </label>
-              ${
-                isLostAndFoundButtonRequired
-                  ? `<button class="lost-and-found-btn" onclick="location.href='lostandfound.html';">Lost and Found</button>`
-                  : ""
-              }
-              ${
-                isManageStockButtonRequired
-                  ? `<button class="lost-and-found-btn" onclick="location.href='managestock.html';">Manage Stock</button>`
-                  : ""
-              }
-            `;
+        <a href="#" class="task-link">${task.subtask}</a>
+      </label>
+      ${
+        isLostAndFoundButtonRequired
+          ? `<button class="lost-and-found-btn" onclick="redirectToPage('lostandfound.html', '${taskData.workorderId}')">Lost and Found</button>`
+          : ""
+      }
+      ${
+        isManageStockButtonRequired
+          ? `<button class="lost-and-found-btn" onclick="redirectToPage('managestock.html', '${taskData.workorderId}')">Manage Stock</button>`
+          : ""
+      }
+    `;
             taskList.appendChild(taskItem);
           });
-        }
-
-        function redirectToPage(pageUrl) {
-          console.log(pageUrl);
-          window.location.href = pageUrl;
         }
 
         populateTaskList();
