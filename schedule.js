@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const dateInput = document.getElementById("scheduleDate");
   const today = formatDate(new Date());
   dateInput.value = formatDateForInput(new Date());
-
   // Sample schedule data with dd/mm/yyyy format
   // if (!localStorage.getItem("schedule")) {
   //   const sampleSchedule = [

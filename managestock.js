@@ -1,12 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Parse the workorderId from the URL
   const urlParams = new URLSearchParams(window.location.search);
-  const roomNumber = urlParams.get("room");
+  const workorderId = urlParams.get("workorderId");
 
-  // Mock room data
-  const roomData = JSON.parse(localStorage.getItem("roomData")) || [];
-  const housekeeper =
-    roomData.find((room) => room.roomNumber === roomNumber)?.housekeeper ||
-    "N/A";
+  // Fetch schedule data from localStorage
+  const schedule = JSON.parse(localStorage.getItem("schedule")) || [];
+
+  // Find the matching task based on workorderId
+  const task = schedule.find((task) => task.workorderId === workorderId) || {};
+  console.log(task);
+  const housekeeper = task.hkName || "N/A";
+  const roomNumber = task.roomNo || "N/A";
 
   // Load stock data from localStorage or initialize it
   const allStockData = JSON.parse(localStorage.getItem("stockData")) || {};
@@ -24,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stockData = allStockData[roomNumber];
 
   // Populate room details
-  document.getElementById("roomNumber").textContent = roomNumber || "N/A";
+  document.getElementById("roomNumber").textContent = roomNumber;
   document.getElementById("housekeeper").textContent = housekeeper;
 
   // Populate stock table
@@ -131,14 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     alert("Stock data updated successfully!");
 
-    window.location.href = `roomdetail.html?room=${encodeURIComponent(
-      roomNumber
+    window.location.href = `roomdetail.html?workorderId=${encodeURIComponent(
+      workorderId
     )}`;
   });
 
   // Set breadcrumb link to Room Detail
   const roomDetailBreadcrumb = document.getElementById("roomDetailBreadcrumb");
-  roomDetailBreadcrumb.href = `roomdetail.html?room=${encodeURIComponent(
-    roomNumber
+  roomDetailBreadcrumb.href = `roomdetail.html?workorderId=${encodeURIComponent(
+    workorderId
   )}`;
 });
