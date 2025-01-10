@@ -43,6 +43,20 @@
         background-color: #218838;
         color: white;
       }
+      .table-striped tbody tr:nth-child(odd).status-doing td,
+      .table-striped tbody tr:nth-child(even).status-doing td {
+        background-color: rgb(255, 255, 100) !important;
+      }
+
+      .table-striped tbody tr:nth-child(odd).status-done td,
+      .table-striped tbody tr:nth-child(odd).status-done td {
+        background-color: rgb(145, 236, 145) !important;
+      }
+
+      .table-striped tbody tr:nth-child(odd).status-todo td,
+      .table-striped tbody tr:nth-child(odd).status-todo td {
+        background-color: white !important;
+      }
     </style>
   </head>
   <body>

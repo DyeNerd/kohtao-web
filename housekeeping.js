@@ -41,6 +41,17 @@ document.addEventListener("DOMContentLoaded", () => {
     filteredTasks.forEach((task) => {
       const upcomingTask = getUpcomingTask(task.hkName, task.workorderId);
       const row = document.createElement("tr");
+      // Add a class based on the task status
+      if (task.status === "doing") {
+        row.classList.add("status-doing");
+        console.log("status doing");
+      } else if (task.status === "done") {
+        row.classList.add("status-done");
+        console.log("status done");
+      } else if (task.status === "to do") {
+        row.classList.add("status-todo");
+        console.log("status todo");
+      }
       row.innerHTML = `
         <td><a href="#" class="wo-link" data-wo="${task.workorderId}">${
         task.hkName
@@ -51,6 +62,15 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${task.realEnd}</td>
         <td>${upcomingTask ? `${upcomingTask.task}` : "No upcoming task"}</td>
       `;
+      if (task.status === "doing") {
+        row.style.backgroundColor = "yellow";
+      } else if (task.status === "done") {
+        row.style.backgroundColor = "green";
+        row.style.color = "white"; // Optional for better readability
+      } else if (task.status === "to do") {
+        row.style.backgroundColor = "white";
+      }
+
       tableBody.appendChild(row);
     });
   }
